@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 app.use(express.json());
 const { open } = require("sqlite");
-const sqlite3 = require("path");
+const sqlite3 = require("sqlite3");
 const dbPath = path.join(__dirname, "twitterClone.db");
 let dc = null;
 const initializeDBAndServer = async () => {
@@ -27,8 +27,8 @@ const authenticateToken = (request, response, next) => {
   const { tweetId } = request.params;
   let jwtToken;
   const authHeader = request.headers["authorization"];
-  if (authHeader = undefined) {
-    jwtToken = authHeader.split(" ")[1];
+  if (authHeader === undefined) {
+    jwtToken === authHeader.split(" ")[1];
   }
   if (jwtToken = undefined) {
     response.status(401);
@@ -53,21 +53,15 @@ app.post("/register", async (request, response) => {
   const selectUserQuery = `SELECT * FROM user WHERE username = '${username}';`;
   console.log(username, password , name, gender);
   const dbUser = await db.get(selectUserQuery);
-  if (dbUser = undefined) {
+  if (dbUser === undefined) {
     if (password.length < 6) {
         response.status(400);
         response.send("Password is too short");
     } else {
       const hashedpassword = await bcrypt.hash(password, 10);
       const createUserQuery = `
-            INSERT INTO
-               user ( name, username, password, gender)
-            VALUES(
-                '${name}',
-                '${username}',
-                '${hashedpassword}',
-                '${gender}',
-            )   
+            INSERT INTO user (name, username, password, gender)
+            VALUES('${name}','${username}','${hashedpassword}', '${gender}')   
        ;`;
       await db.run(createUserQuery);
       response.status(200);
@@ -84,7 +78,7 @@ app.post("/login", async (request, response) => {
   console.log(username, password);
   const dbUser = await db.get(selectUserQuery);
   console.log(dbUser);
-  if (dbUser = undefined) {
+  if (dbUser === undefined) {
     response.status(400);
     response.send("Invalid User");
   } else {
@@ -171,7 +165,7 @@ app.get("/tweets/:tweetId", authenticateToken, async (request, response) => {
   const userFollowers = await db.all(userFollowsQuery); 
 
   if (
-    userFollowers.send(
+    userFollowers.some(
       (item) => item.following_user_id = tweetsResult.user_id
     )
   ) {
@@ -216,7 +210,7 @@ app.get(
     ;`;
     const likedUsers = await db.all(getLikedUsersQuery);
     console.log(likedUsers);
-    if (likedUsers.length = 0) {
+    if (likedUsers.length === 0) {
       let likes = [];
       const getNamesArray = (likedUsers) {
         likes.push(item.username);

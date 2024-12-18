@@ -28,9 +28,9 @@ const authenticateToken = (request, response, next) => {
   let jwtToken;
   const authHeader = request.headers["authorization"];
   if (authHeader === undefined) {
-    jwtToken === authHeader.split(" ")[1];
+    jwtToken = authHeader.split(" ")[1];
   }
-  if (jwtToken = undefined) {
+  if (jwtToken === undefined) {
     response.status(401);
     response.send("Invalid JWT Token");
   } else {
@@ -83,7 +83,7 @@ app.post("/login", async (request, response) => {
     response.send("Invalid User");
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
-    if (isPasswordMatched = true) {
+    if (isPasswordMatched === true) {
       const jwtToken = jwt.sign(dbUser, "MY_SECRET_TOKEN");
       response.send({ jwtToken });
     } else {
@@ -166,7 +166,7 @@ app.get("/tweets/:tweetId", authenticateToken, async (request, response) => {
 
   if (
     userFollowers.some(
-      (item) => item.following_user_id = tweetsResult.user_id
+      (item) => item.following_user_id === tweetsResult.user_id
     )
   ) {
     console.log(tweetsResult);
@@ -206,7 +206,7 @@ app.get(
             follower INNER JOIN tweet ON tweet.user_id = follower.following_user_id INNER JOIN like ON like.tweet_id = tweet.tweet_id
             INNER JOIN user ON user.user_id = like.user_id
           WHERE
-          tweet.tweet_id = ${tweetId} AND follower.follower_user_id = ${user_id}
+          tweet.user_id = ${user_id}} AND follower.follower_user_id = ${user_id}
     ;`;
     const likedUsers = await db.all(getLikedUsersQuery);
     console.log(likedUsers);
@@ -219,8 +219,7 @@ app.get(
     getNamesArray(likedUsers);
     response.send({ likes });
    } else {
-    response.status(401);
-    response.send("Invalid Request");
+    response.status(400).send("Invalid Requset");
   }
 );
 
@@ -243,7 +242,7 @@ app.get(
     ;`;
     const repliedUsers = await db.all(getRepliedUserQuery);
     console.log(repliedUsers);
-    if (repliedUsers.length = 0) {
+    if (repliedUsers.length === 0) {
       let replies = [];
       const getNamesArray = (repliedUsers) => {
         for (let item of repliedUsers) {
@@ -254,11 +253,11 @@ app.get(
           replies.push(repliedUsers);
           response.send({ replies });
         } else {
-          response.status(401);
-          response.send("Invalid Request");
+          response.status(400).send("Invalid Request");
         }
       }
     }            
+  }
 );
 
 app.get("/user/tweets", authenticateToken, async (request, response) => {

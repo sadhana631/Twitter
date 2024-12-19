@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 app.use(express.json());
@@ -32,7 +33,7 @@ const authenticateToken = (request, response, next) => {
   }
   if (jwtToken === undefined) {
     response.status(401);
-    response.send("Invalid JWT Token");
+    response.send("Invalid JWT Token");  
   } else {
     jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error,payload) => {
         if (error) {
@@ -84,7 +85,7 @@ app.post("/login", async (request, response) => {
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
     if (isPasswordMatched === true) {
-      const jwtToken = jwt.sign(dbUser, "MY_SECRET_TOKEN");
+      const jwtToken = jwt.sign({ user_id: dbUser.user_id }, "MY_SECRET_TOKEN");
       response.send({ jwtToken });
     } else {
       response.status(400);
@@ -142,8 +143,8 @@ app.get("/user/followers", authenticateToken, async (request, response) => {
         WHERE
            follower.following_user_id = ${user_id}
     ;`;
-  const userFollowsArray = await db.all(userFollowsQuery);
-  response.send(userFollowsArray);              
+  const userFollowers = await db.all(userFollowsQuery);
+  response.send(userFollowers);              
 });
 
 app.get("/tweets/:tweetId", authenticateToken, async (request, response) => {
@@ -217,6 +218,7 @@ app.get(
       }
     };
     getNamesArray(likedUsers);
+    const likes = likedUsers.map((user) => user.username);
     response.send({ likes });
    } else {
     response.status(400).send("Invalid Requset");
@@ -283,7 +285,7 @@ app.get("/user/tweets", authenticateToken, async (request, response) => {
 });
 
 app.post("/user/tweets", authenticateToken, async (request, response) => {
-  const { tweett } = request;
+  const { tweet } = request;
   const { tweetId } = request;
   const { payload } = request;
   const { user_id, name, username, gender } = payload;

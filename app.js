@@ -7,7 +7,7 @@ app.use(express.json());
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const dbPath = path.join(__dirname, "twitterClone.db");
-let dc = null;
+let db = null;
 const initializeDBAndServer = async () => {
     try {
       db = await open({
@@ -28,7 +28,7 @@ const authenticateToken = (request, response, next) => {
   const { tweetId } = request.params;
   let jwtToken;
   const authHeader = request.headers["authorization"];
-  if (authHeader === undefined) {
+  if (authHeader !== undefined) {
     jwtToken = authHeader.split(" ")[1];
   }
   if (jwtToken === undefined) {
@@ -62,8 +62,8 @@ app.post("/register", async (request, response) => {
       const hashedpassword = await bcrypt.hash(password, 10);
       const createUserQuery = `
             INSERT INTO user (name, username, password, gender)
-            VALUES('${name}','${username}','${hashedpassword}', '${gender}')   
-       ;`;
+            VALUES('${name}','${username}','${hashedpassword}', '${gender}');
+      `;
       await db.run(createUserQuery);
       response.status(200);
       response.send("User created successfully");

@@ -1,13 +1,14 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 app.use(express.json());
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
+const path = require("path");
 const dbPath = path.join(__dirname, "twitterClone.db");
 let db = null;
+
 const initializeDBAndServer = async () => {
     try {
       db = await open({
@@ -18,7 +19,7 @@ const initializeDBAndServer = async () => {
         console.log("Server is Running at http://localhost:3000");
       });
     } catch (e) {
-        console.log(`DB Error: ${e.message}`);
+       console.log(`DB Error: ${e.message}`);
     }
 };
 initializeDBAndServer();
@@ -221,8 +222,10 @@ app.get(
     const likes = likedUsers.map((user) => user.username);
     response.send({ likes });
    } else {
-    response.status(400).send("Invalid Requset");
-  }
+    response.status(401);
+    response.send("Invalid Request");
+   }
+  } 
 );
 
 app.get(
